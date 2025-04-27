@@ -1,12 +1,10 @@
-// server.jsnn
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const cors = require("cors")
+const cors = require("cors");
 
 const app = express();
-app.use(cors())
+app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
@@ -17,9 +15,11 @@ mongoose.connect(process.env.MONGODB_URL, {
   useUnifiedTopology: true
 })
   .then(() => {
-    console.log("Connection Successfull")
-  }).catch(() => console.log('connection not done'))
-
+    console.log("Connection Successful");
+  })
+  .catch((err) => {
+    console.log("MongoDB connection error:", err.message);
+  });
 
 // Define Schema
 const blogSchema = new mongoose.Schema({
@@ -35,13 +35,12 @@ const Blog = mongoose.model('Blog', blogSchema);
 app.get('/api/blogs', async (req, res) => {
   try {
     const blogs = await Blog.find({});
-    console.log(blogs)
-    res.send(blogs)
+    console.log(blogs);
+    res.send(blogs);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 app.patch('/api/blogs/like/:id', async (req, res) => {
   try {
@@ -63,9 +62,7 @@ app.patch('/api/blogs/like/:id', async (req, res) => {
   }
 });
 
-
 app.post('/api/blogs', async (req, res) => {
-
   const blog = new Blog({
     newTitle: req.body.newTitle,
     newContent: req.body.newContent,
